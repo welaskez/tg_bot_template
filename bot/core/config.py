@@ -58,6 +58,3 @@ class Settings(BaseSettings):
     db: DatabaseConfig
 
     log: LoggingConfig = LoggingConfig()
-
-
-settings = Settings()
