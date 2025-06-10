@@ -1,13 +1,13 @@
 from typing import Any, Generic, Optional, cast
 
+from core.models import Base
 from sqlalchemy import ColumnExpressionArgument, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import DeclarativeMeta
 from typing_extensions import TypeVar
 
 from .abc import AbstractRepository
 
-T = TypeVar("T", bound=DeclarativeMeta)
+T = TypeVar("T", bound=Base)
 
 
 class SQLAlchemyRepository(Generic[T], AbstractRepository):
