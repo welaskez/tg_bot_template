@@ -4,7 +4,7 @@ from typing import Any
 
 class AbstractService(ABC):
     @abstractmethod
-    async def get(self, *args: Any, **kwargs: Any) -> Any:
+    async def get_by_id(self, *args: Any, **kwargs: Any) -> Any:
         pass
 
     @abstractmethod
