@@ -4,8 +4,11 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
 from core.apscheduler.app import scheduler
 from core.config import Settings
+from core.enums.envs import Envs
 from core.providers.app import AppProvider
 from core.providers.database import SQLAlchemyProvider
 from core.providers.redis import RedisProvider
@@ -28,7 +31,11 @@ async def on_shutdown(bot: Bot, dispatcher: Dispatcher) -> None:
 
 async def main() -> None:
     container = make_async_container(
-        AppProvider(), SQLAlchemyProvider(), RedisProvider(), UOWProvider(), ServiceProvider()
+        AppProvider(),
+        SQLAlchemyProvider(),
+        RedisProvider(),
+        UOWProvider(),
+        ServiceProvider(),
     )
 
     settings = await container.get(Settings)
@@ -40,7 +47,13 @@ async def main() -> None:
             parse_mode=ParseMode.HTML,
         ),
     )
-    dp = Dispatcher()
+    dp = Dispatcher(
+        storage=(
+            MemoryStorage()
+            if settings.environment == Envs.local_test
+            else RedisStorage.from_url(str(settings.redis.url))
+        )
+    )
 
     await bot.delete_webhook(drop_pending_updates=True)
 
