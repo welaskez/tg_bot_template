@@ -15,6 +15,10 @@ class UserService(AbstractService):
         async with self._uow_factory() as uow:
             return await uow.users.get(User.id == user_id)
 
+    async def get_by_tg_id(self, tg_id: int) -> User | None:
+        async with self._uow_factory() as uow:
+            return await uow.users.get(User.tg_id == tg_id)
+
     async def add(self, user_create: UserCreate) -> User:
         async with self._uow_factory() as uow:
             user = await uow.users.add(**user_create.model_dump())
