@@ -1,14 +1,24 @@
 from abc import ABC, abstractmethod
-from typing import Self
+from types import TracebackType
+from typing import Optional, Self
+
+from repositories.user import UserRepository
 
 
 class AbstractUOW(ABC):
+    users: UserRepository
+
     @abstractmethod
     async def __aenter__(self) -> Self:
         pass
 
     @abstractmethod
-    async def __aexit__(self) -> None:
+    async def __aexit__(
+        self,
+        exc_type: Optional[type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         pass
 
     @abstractmethod
