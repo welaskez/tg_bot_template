@@ -11,6 +11,7 @@ from core.config import Settings
 from core.enums.envs import Envs
 from core.providers.app import AppProvider
 from core.providers.database import SQLAlchemyProvider
+from core.providers.feature import FeatureProvider
 from core.providers.redis import RedisProvider
 from core.providers.service import ServiceProvider
 from core.providers.uow import UOWProvider
@@ -36,6 +37,7 @@ async def main() -> None:
         RedisProvider(),
         UOWProvider(),
         ServiceProvider(),
+        FeatureProvider(),
     )
 
     settings = await container.get(Settings)
