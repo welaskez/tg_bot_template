@@ -29,5 +29,8 @@ start_docker:
 stop_docker:
 	docker compose down
 
+docker_watch:
+	docker compose watch
+
 start:
 	@uv run python -m $(SERVICE_DIR).main

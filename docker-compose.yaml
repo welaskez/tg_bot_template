@@ -24,6 +24,13 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./bot
+          target: /app
+        - action: rebuild
+          path: ./uv.lock
 
   postgres:
     image: postgres:16
