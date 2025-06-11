@@ -1,6 +1,6 @@
 from typing import Optional
 
-from core.feature.dto import FeatureData
+from core.schemas.feature import FeatureData
 
 
 class FeatureRegistry:
