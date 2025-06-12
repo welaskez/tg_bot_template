@@ -2,9 +2,10 @@ from typing import Any, AsyncGenerator, Callable
 
 import pytest
 from core.config import Settings
-from core.models import Base
+from core.models import Base, User
 from core.models.engine import DatabaseHelper
 from core.providers.app import AppProvider
+from core.schemas.user import UserCreate
 from dishka import AsyncContainer, make_async_container
 from services.user import UserService
 from testcontainers.postgres import PostgresContainer
@@ -62,3 +63,7 @@ async def sqla_uow_factory(db_helper: DatabaseHelper) -> Callable[[], AbstractUO
 @pytest.fixture()
 def user_service(sqla_uow_factory: Callable[[], AbstractUOW], settings: Settings) -> UserService:
     return UserService(sqla_uow_factory, settings)
+
+@pytest.fixture()
+async def user(user_service: UserService) -> User:
+    return await user_service.add(UserCreate(tg_id=12345, username="zan"))
