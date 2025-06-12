@@ -1,12 +1,15 @@
-from core.schemas.keyboard import KeyboardData
+from core.schemas.keyboard import KeyboardData, ReplyButton
 
 
 class KeyboardRegistry:
     KEYBOARDS: dict[str, KeyboardData] = {
-        "start": KeyboardData(),
-        "help": KeyboardData(),
-        "settings": KeyboardData(),
-        "empty": KeyboardData(),
+        "start": KeyboardData(
+            reply_buttons=[
+                ReplyButton(text="Нажми меня"),
+                ReplyButton(text="Рейтинг"),
+                ReplyButton(text="Мой профиль"),
+            ]
+        )
     }
 
     @classmethod
