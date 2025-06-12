@@ -25,6 +25,8 @@ class SQLAlchemyUOW(AbstractUOW):
     ) -> None:
         if exc_type:
             await self.rollback()
+        else:
+            await self.commit()
         await self._session.close()
 
     async def rollback(self) -> None:

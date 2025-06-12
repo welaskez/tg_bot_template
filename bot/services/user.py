@@ -22,7 +22,6 @@ class UserService(AbstractService):
     async def add(self, user_create: UserCreate) -> User:
         async with self._uow_factory() as uow:
             user = await uow.users.add(**user_create.model_dump())
-            await uow.commit()
             return user
 
     async def update(self, user_id: int, user_update: UserUpdate) -> User | None:
@@ -31,8 +30,6 @@ class UserService(AbstractService):
 
             if user:
                 user = await uow.users.update(user, **user_update.model_dump(exclude_unset=True))
-                await uow.commit()
-
                 return user
 
             return None
@@ -42,4 +39,3 @@ class UserService(AbstractService):
             user = await uow.users.get(User.id == user_id)
             if user:
                 await uow.users.delete(user)
-                await uow.commit()
