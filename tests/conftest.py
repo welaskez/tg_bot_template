@@ -1,42 +1,49 @@
-from typing import Any, AsyncGenerator
+from typing import Callable
 
 import pytest
-from core.config import Settings
-from core.providers.app import AppProvider
-from core.providers.database import SQLAlchemyProvider
-from core.providers.feature import FeatureProvider
-from core.providers.keyboard import KeyboardProvider
-from core.providers.redis import RedisProvider
-from core.providers.service import ServiceProvider
-from core.providers.ui import UIProvider
-from core.providers.uow import UOWProvider
-from dishka import AsyncContainer, make_async_container
+from core.models import Base
+from core.models.engine import DatabaseHelper
 from services.user import UserService
+from testcontainers.postgres import PostgresContainer
+from uow.abc import AbstractUOW
+from uow.sqlalchemy import SQLAlchemyUOW
 
 
 @pytest.fixture()
-async def container() -> AsyncGenerator[AsyncContainer, Any]:
-    container = make_async_container(
-        AppProvider(),
-        SQLAlchemyProvider(),
-        RedisProvider(),
-        UOWProvider(),
-        ServiceProvider(),
-        FeatureProvider(),
-        UIProvider(),
-        KeyboardProvider(),
+def postgres_container():
+    with PostgresContainer(
+        image="postgres:15",
+        driver="asyncpg"
+    ) as postgres:
+        yield postgres
+
+
+@pytest.fixture()
+def db_helper(postgres_container: PostgresContainer) -> DatabaseHelper:
+    return DatabaseHelper(
+        url=postgres_container.get_connection_url(driver="asyncpg"),
+        pool_size=50,
+        max_overflow=10,
+        echo=True,
+        echo_pool=True,
     )
 
-    yield container
 
-    await container.close()
+@pytest.fixture(scope="session", autouse=True)
+async def setup_db(db_helper: DatabaseHelper):
+    async with db_helper.engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+        yield
+
+        await conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest.fixture()
-async def settings(container: AsyncContainer) -> Settings:
-    return await container.get(Settings)
+async def sqla_uow_factory(db_helper: DatabaseHelper) -> Callable[[], AbstractUOW]:
+    return lambda: SQLAlchemyUOW(session_pool=db_helper.session_pool)
 
 
 @pytest.fixture()
-async def user_service(container: AsyncContainer) -> UserService:
-    return await container.get(UserService)
+def user_service(sqla_uow_factory: Callable[[], AbstractUOW]) -> UserService:
+    return UserService(sqla_uow_factory)
