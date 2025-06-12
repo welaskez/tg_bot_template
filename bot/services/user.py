@@ -2,7 +2,7 @@ from typing import Callable
 
 from core.config import Settings
 from core.models import User
-from core.schemas.user import UserCreate, UserUpdate
+from core.schemas.user import UserCreate, UserUpdate, UserUpdateForm
 from uow.abc import AbstractUOW
 
 from .abc import AbstractService
@@ -26,13 +26,8 @@ class UserService(AbstractService):
             user = await uow.users.add(**user_create.model_dump())
             return user
 
-    async def update(self, user_id: int, user_update: UserUpdate) -> User | None:
+    async def update(self, user: User, user_update: UserUpdate | UserUpdateForm) -> User | None:
         async with self._uow_factory() as uow:
-            user = await uow.users.get(User.id == user_id)
-
-            if not user:
-                raise ValueError("User not found!")
-
             user = await uow.users.update(user, **user_update.model_dump(exclude_unset=True))
             return user
 
@@ -50,3 +45,11 @@ class UserService(AbstractService):
             raise ValueError("Incorrect register passphrase!")
 
         return await self.add(user_create)
+
+    async def fill_form(self, tg_id: int, form: UserUpdateForm) -> User | None:
+        user = await self.get_by_tg_id(tg_id=tg_id)
+
+        if not user:
+            raise ValueError("User not found!")
+
+        return await self.update(user, form)

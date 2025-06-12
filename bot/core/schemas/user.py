@@ -15,3 +15,9 @@ class UserUpdate(BaseModel):
     name: str | None = None
     info: str | None = None
     photo: str | None = None
+
+
+class UserUpdateForm(BaseModel):
+    name: str
+    info: str
+    photo: str
