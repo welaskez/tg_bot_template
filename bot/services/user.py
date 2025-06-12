@@ -30,17 +30,20 @@ class UserService(AbstractService):
         async with self._uow_factory() as uow:
             user = await uow.users.get(User.id == user_id)
 
-            if user:
-                user = await uow.users.update(user, **user_update.model_dump(exclude_unset=True))
-                return user
+            if not user:
+                raise ValueError("User not found!")
 
-            return None
+            user = await uow.users.update(user, **user_update.model_dump(exclude_unset=True))
+            return user
 
     async def delete(self, user_id: int) -> None:
         async with self._uow_factory() as uow:
             user = await uow.users.get(User.id == user_id)
-            if user:
-                await uow.users.delete(user)
+
+            if not user:
+                raise ValueError("User not found!")
+
+            await uow.users.delete(user)
 
     async def register(self, user_create: UserCreate, register_passphrase: str | None = None) -> User | None:
         if register_passphrase and register_passphrase != self._settings.register_passphrase:
