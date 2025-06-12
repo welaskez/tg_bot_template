@@ -1,6 +1,8 @@
 from typing import Callable
 
 import pytest
+
+from core.config import Settings
 from core.models import Base
 from core.models.engine import DatabaseHelper
 from services.user import UserService
@@ -11,10 +13,7 @@ from uow.sqlalchemy import SQLAlchemyUOW
 
 @pytest.fixture()
 def postgres_container():
-    with PostgresContainer(
-        image="postgres:15",
-        driver="asyncpg"
-    ) as postgres:
+    with PostgresContainer(image="postgres:15", driver="asyncpg") as postgres:
         yield postgres
 
 
