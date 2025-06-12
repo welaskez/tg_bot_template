@@ -46,7 +46,4 @@ class UserService(AbstractService):
         if register_passphrase and register_passphrase != self._settings.register_passphrase:
             raise ValueError("Incorrect register passphrase!")
 
-        if not user_create.username:
-            raise ValueError("Must be username!")
-
         return await self.add(user_create)
