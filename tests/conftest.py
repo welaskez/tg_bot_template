@@ -34,8 +34,9 @@ async def setup_db(db_helper: DatabaseHelper):
     async with db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-        yield
+    yield
 
+    async with db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
 
