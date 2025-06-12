@@ -1,5 +1,6 @@
 from typing import Callable
 
+from core.config import Settings
 from core.models import User
 from core.schemas.user import UserCreate, UserUpdate
 from uow.abc import AbstractUOW
@@ -8,8 +9,9 @@ from .abc import AbstractService
 
 
 class UserService(AbstractService):
-    def __init__(self, uow_factory: Callable[[], AbstractUOW]) -> None:
+    def __init__(self, uow_factory: Callable[[], AbstractUOW], settings: Settings) -> None:
         self._uow_factory = uow_factory
+        self._settings = settings
 
     async def get_by_id(self, user_id: int) -> User | None:
         async with self._uow_factory() as uow:
@@ -39,3 +41,12 @@ class UserService(AbstractService):
             user = await uow.users.get(User.id == user_id)
             if user:
                 await uow.users.delete(user)
+
+    async def register(self, user_create: UserCreate, register_passphrase: str | None = None) -> User | None:
+        if register_passphrase and register_passphrase != self._settings.register_passphrase:
+            raise ValueError("Incorrect register passphrase!")
+
+        if not user_create.username:
+            raise ValueError("Must be username!")
+
+        return await self.add(user_create)
