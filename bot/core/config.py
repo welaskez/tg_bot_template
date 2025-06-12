@@ -58,3 +58,5 @@ class Settings(BaseSettings):
     db: DatabaseConfig
 
     log: LoggingConfig = LoggingConfig()
+
+    register_passphrase: str
