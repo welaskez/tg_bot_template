@@ -12,6 +12,9 @@ async def test_registration_with_correct_register_passphrase(
 ) -> None:
     user = await user_service.register(UserCreate(tg_id=1234, username=username), register_passphrase)
 
+    from_db = await user_service.get_by_id(user.id)
+    assert from_db is not None
+
     assert user.tg_id == 1234
     assert user.username == username
 
@@ -33,6 +36,9 @@ async def test_registration_without_register_passphrase(
     username: str,
 ) -> None:
     user = await user_service.register(UserCreate(tg_id=1234, username=username), register_passphrase)
+
+    from_db = await user_service.get_by_id(user.id)
+    assert from_db is not None
 
     assert user.tg_id == 1234
     assert user.username == username
