@@ -1,7 +1,6 @@
 import pytest
-from pydantic import ValidationError
-
 from core.schemas.user import UserCreate
+from pydantic import ValidationError
 from services.user import UserService
 
 
