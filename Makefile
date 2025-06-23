@@ -24,7 +24,7 @@ format:
 	@uv run black $(SERVICE_DIR)/
 
 run_tests:
-	@pytest tests -s -v
+	@uv run pytest tests -s -v
 
 start_docker:
 	docker compose down && docker compose up --build -d && docker compose logs -f
