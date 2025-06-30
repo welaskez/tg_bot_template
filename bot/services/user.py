@@ -44,7 +44,11 @@ class UserService(AbstractService):
         if register_passphrase and register_passphrase != self._settings.register_passphrase:
             raise ValueError("Incorrect register passphrase!")
 
-        return await self.add(user_create)
+        user = await self.get_by_tg_id(tg_id=user_create.tg_id)
+        if not user:
+            user = await self.add(user_create)
+
+        return user
 
     async def fill_form(self, tg_id: int, form: UserUpdateForm) -> User | None:
         user = await self.get_by_tg_id(tg_id=tg_id)

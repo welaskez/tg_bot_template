@@ -11,11 +11,8 @@ from core.config import Settings
 from core.enums.envs import Envs
 from core.providers.app import AppProvider
 from core.providers.database import SQLAlchemyProvider
-from core.providers.feature import FeatureProvider
-from core.providers.keyboard import KeyboardProvider
 from core.providers.redis import RedisProvider
 from core.providers.service import ServiceProvider
-from core.providers.ui import UIProvider
 from core.providers.uow import UOWProvider
 from dishka import make_async_container
 from dishka.integrations.aiogram import setup_dishka
@@ -34,14 +31,7 @@ async def on_shutdown(bot: Bot, dispatcher: Dispatcher) -> None:
 
 async def main() -> None:
     container = make_async_container(
-        AppProvider(),
-        SQLAlchemyProvider(),
-        RedisProvider(),
-        UOWProvider(),
-        ServiceProvider(),
-        FeatureProvider(),
-        UIProvider(),
-        KeyboardProvider(),
+        AppProvider(), SQLAlchemyProvider(), RedisProvider(), UOWProvider(), ServiceProvider()
     )
 
     settings = await container.get(Settings)
